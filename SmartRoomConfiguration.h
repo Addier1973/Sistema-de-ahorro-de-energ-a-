@@ -55,4 +55,6 @@ public:
     static uint16_t rs485_timeout;
     // Minimum length for a signal train to be considered valid AC IR signal train
     static uint16_t minimum_ac_ir_train_length;
+    // Saving temperature in degrees Celsius (default 27°C)
+    static uint8_t saving_temperature;
 };

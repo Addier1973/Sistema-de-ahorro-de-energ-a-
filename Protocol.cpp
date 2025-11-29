@@ -186,6 +186,15 @@ void Protocol::process_message(uint8_t slave_id, uint16_t message_length, uint8_
         memcpy(this->ac->ir_idle_values, payload + 3, message_length - 3);
         break;
 
+    case MessageKind_SavingTempCommand: // debugln(F("Received Saving Temperature IR"))
+        // NOTE: This message type needs to be added to protocol.pb.h if it doesn't exist
+        // Format: [MessageKind][Length_Low][Length_High][IR_Data...]
+        this->ac->ir_saving_temp_length = payload[PAYLOAD_IR_LENGTH_INDEX] + (payload[PAYLOAD_IR_LENGTH_INDEX + 1] << 8);
+        if (this->ac->ir_saving_temp_length <= IR_MAX_SAMPLES / 2) {
+            memcpy(this->ac->ir_saving_temp_values, payload + 3, message_length - 3);
+        }
+        break;
+
     case MessageKind_IRCommand: // debugln(F("Received IRCommand"))
         static uint16_t length = (payload[PAYLOAD_IR_LENGTH_INDEX] + (payload[PAYLOAD_IR_LENGTH_INDEX + 1] << 8));
         this->ac->send_compressed_train(payload + 2, length);

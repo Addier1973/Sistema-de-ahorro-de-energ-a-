@@ -55,11 +55,17 @@ void SmartRoom::initialize() {
         }
 
         switch (this->state_machine.required_ac_action) {
-            case RequiredACAction::PowerOn:
-                this->ac.set_power(true);
+            case RequiredACAction::PowerOn:  // Deprecated, kept for compatibility
+                this->ac.set_client_temperature();
                 break;
-            case RequiredACAction::PowerOff:
-                this->ac.set_power(false);
+            case RequiredACAction::PowerOff:  // Deprecated, kept for compatibility
+                this->ac.set_saving_temperature();
+                break;
+            case RequiredACAction::SetClientTemperature:
+                this->ac.set_client_temperature();
+                break;
+            case RequiredACAction::SetSavingTemperature:
+                this->ac.set_saving_temperature();
                 break;
             case RequiredACAction::None:
                 break;
@@ -69,21 +75,23 @@ void SmartRoom::initialize() {
         // Update stuffs before updating FSM's state, so we can use the differences
         // between the last and current state
         {
-            // If the AC power status is ON and ac_poweron_delay finishes turn it ON
+            // If the AC power status is ON and ac_poweron_delay finishes set client temperature
             if (this->state_machine.ac_poweron_delay.timeout() && this->state_machine.ac_power) {
-                this->ac.set_power(true);
+                this->ac.set_client_temperature();
                 this->state_machine.ac_poweron_delay.stop();
             }
 
-            // If the AC changed status irSend the IR Command
+            // If the AC changed status, change temperature accordingly
             if (this->state_machine.ac_power != this->state_machine.last_state.ac_power) {
                 if (this->state_machine.ac_power) {
-                    this->ac.set_power(true);
+                    // Room is occupied, set to client's preferred temperature
+                    this->ac.set_client_temperature();
                 } else {
-                    this->ac.set_power(false);
+                    // Room is empty, set to saving temperature
+                    this->ac.set_saving_temperature();
                 }
 
-                // If the AC was turned off start the re-start delay timer
+                // If the AC was set to saving temperature, start the re-start delay timer
                 if (!this->state_machine.ac_power) {
                     this->state_machine.ac_poweron_delay.restart();
                 }

@@ -75,11 +75,25 @@ public:
 
     volatile uint16_t last_user_ir_length = 0;
 
-    // Storage for the IDLE IR Command
+    // Storage for the IDLE IR Command (deprecated, kept for compatibility)
     uint16_t ir_idle_length = EXTERNAL_IDLE_IR_LENGTH;
     uint8_t ir_idle_values[IR_MAX_SAMPLES / 2] = {EXTERNAL_IDLE_IR};
 
-    void set_power(bool power_state);
+    // Storage for the client's temperature IR command (last command received from user)
+    uint16_t ir_client_temp_length = 0;
+    uint8_t ir_client_temp_values[IR_MAX_SAMPLES / 2] = {};
+
+    // Storage for the saving temperature IR command (27°C by default, configurable)
+    uint16_t ir_saving_temp_length = EXTERNAL_SAVING_TEMP_IR_LENGTH;
+    uint8_t ir_saving_temp_values[IR_MAX_SAMPLES / 2] = {EXTERNAL_SAVING_TEMP_IR};
+
+    void set_power(bool power_state); // Deprecated, kept for compatibility
+
+    // Set temperature to client's preferred temperature
+    void set_client_temperature();
+
+    // Set temperature to saving temperature (default 27°C)
+    void set_saving_temperature();
 
     void resume();
 };

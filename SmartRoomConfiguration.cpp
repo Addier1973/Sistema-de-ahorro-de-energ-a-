@@ -12,3 +12,4 @@ uint16_t SmartRoomConfiguration::rs485_tx_delay = 750;
 uint16_t SmartRoomConfiguration::rs485_post_tx_delay = 1750;
 uint16_t SmartRoomConfiguration::rs485_timeout = 1000;
 uint16_t SmartRoomConfiguration::minimum_ac_ir_train_length = 30;
+uint8_t SmartRoomConfiguration::saving_temperature = 27;

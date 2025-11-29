@@ -98,6 +98,17 @@ IREventType AC::task()
             BLINK100
 
             this->last_user_ir_length = ir_value_index;
+            
+            // Save the client's temperature command when detected
+            this->ir_client_temp_length = ir_value_index;
+            uint16_t buffer_size = (ir_value_index + 1) / 2;
+            if (buffer_size > IR_MAX_SAMPLES / 2) {
+                buffer_size = IR_MAX_SAMPLES / 2;
+            }
+            for (uint16_t i = 0; i < buffer_size; i++) {
+                this->ir_client_temp_values[i] = ir_values[i];
+            }
+            
             this->resume();
 
             return IREventAC;
@@ -116,18 +127,35 @@ bool current_ac_status = false;
 
 void AC::set_power(bool power_state)
 {
-    if (current_ac_status == power_state)
-        return;
-    current_ac_status = power_state;
-
+    // Deprecated: kept for compatibility, but now uses temperature control
     if (power_state)
     {
-        this->send_compressed_train(const_cast<uint8_t *>(ir_values), this->last_user_ir_length);
+        this->set_client_temperature();
     }
     else
     {
-        this->send_compressed_train((uint8_t *)this->ir_idle_values, this->ir_idle_length);
+        this->set_saving_temperature();
     }
+}
+
+void AC::set_client_temperature()
+{
+    // Only send if we have a valid client temperature command stored
+    if (this->ir_client_temp_length > 0)
+    {
+        this->send_compressed_train(this->ir_client_temp_values, this->ir_client_temp_length);
+    }
+    else if (this->last_user_ir_length > 0)
+    {
+        // Fallback to last received command if client temp not stored yet
+        this->send_compressed_train(const_cast<uint8_t *>(ir_values), this->last_user_ir_length);
+    }
+}
+
+void AC::set_saving_temperature()
+{
+    // Send the saving temperature command (default 27°C)
+    this->send_compressed_train(this->ir_saving_temp_values, this->ir_saving_temp_length);
 }
 
 void AC::resume()

@@ -88,7 +88,7 @@ bool RoomStateMachine::update()
         if (poweroff_timeout)
         {
             this->tv_power = false;
-            this->required_ac_action = RequiredACAction::PowerOff;
+            this->required_ac_action = RequiredACAction::SetSavingTemperature;
             this->poweroff_timer.stop();
         }
 
@@ -102,7 +102,7 @@ bool RoomStateMachine::update()
 
             this->set_state(RoomState::Occupied);
             this->tv_power = true;
-            this->required_ac_action = RequiredACAction::PowerOn;
+            this->required_ac_action = RequiredACAction::SetClientTemperature;
             something_changed = true;
         }
 

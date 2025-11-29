@@ -10,8 +10,10 @@ class SmartRoom;
 enum RequiredACAction
 {
     None,
-    PowerOff,
-    PowerOn
+    PowerOff,  // Deprecated, kept for compatibility
+    PowerOn,   // Deprecated, kept for compatibility
+    SetClientTemperature,  // Set AC to client's preferred temperature
+    SetSavingTemperature   // Set AC to saving temperature (default 27°C)
 };
 
 // Possible states of the room
